@@ -1,0 +1,41 @@
+name: Update Screenshot
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  screenshot:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v2
+
+    - name: Set up Node.js
+      uses: actions/setup-node@v2
+      with:
+        node-version: '14'
+
+    - name: Install dependencies
+      run: npm install
+
+    - name: Build the project
+      run: npm run build
+
+    - name: Start the server
+      run: npm start &
+      env:
+        CI: true
+
+    - name: Take screenshot
+      run: node screenshot.js
+
+    - name: Commit screenshot to repo
+      run: |
+        git config --global user.name 'GitHub Action'
+        git config --global user.email 'action@github.com'
+        git add screenshot.png
+        git commit -m "Update screenshot"
+        git push
